@@ -6,12 +6,7 @@
 
 #include "buffer.h"
 
-static const uint8_t METHOD_NO_AUTHENTICATION_REQUIRED = 0x00;
-static const uint8_t METHOD_NO_ACCEPTABLE_METHODS      = 0xFF;
-
-
-
-
+#define MAXCMDSIZE 1000 // ESTE DEFINE DBEERIA ESTAR EN USERCMD.H PERO NO SE COMO PASARLO SIN ROMPER TODO
 
 enum pop3_state_type {
     usercmd,
@@ -21,7 +16,7 @@ enum pop3_state_type {
 
 struct usercmd_machine {
 	bool cr;
-	char *cmd;
+	char cmd[MAXCMDSIZE];
 };
 
 union pop3_machine {
