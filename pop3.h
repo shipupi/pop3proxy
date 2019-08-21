@@ -36,7 +36,8 @@ struct pop3_parser {
 	// Le paso la union que tiene todas las maquinas
 	// Segun la implementacion va a bsucar la maquina
 	// de la clase en la que estoy
-	enum pop3_state_type (*feed_method)(union pop3_machine *machine_ptr, uint8_t b);
+	
+	enum pop3_state_type (*feed_method)(struct pop3_parser *p, uint8_t b);
 };
 
 /** inicializa el parser */

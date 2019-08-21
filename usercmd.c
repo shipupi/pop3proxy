@@ -6,23 +6,21 @@
 
 
 extern enum pop3_state_type 
-usercmd_feed(union pop3_machine *machine_ptr, uint8_t b) {
-	struct usercmd_machine *mc = &machine_ptr->usercmd_mc;
+usercmd_feed(struct pop3_parser *p, uint8_t b) {
+	struct usercmd_machine *mc = &p->state_machine.usercmd_mc;
 	size_t cmdLen = strlen(mc->cmd);
 	if (mc->cr) {
 		// Nos fijamos que comando hubo y segun eso elegimos
 		// La maquina de estados a la que seguimos
 		// Defaulteamos a server_crlf por ahora
-		printf("Cambiando de estado con cmd: %s\n", mc->cmd);
 		return sv_crlf;
 	} else if(b == '\r'){
 		mc->cr = true;
-	} else {	
+	} else {
 		mc->cr = false;
 	}
-
-	printf("Current command: %s\n", mc->cmd);
 	mc->cmd[cmdLen] = b;
+	printf("Current command: %s\n", mc->cmd);
 	return usercmd;
 }
 

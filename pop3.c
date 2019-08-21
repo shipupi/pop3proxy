@@ -20,12 +20,10 @@ main(const int argc, const char **argv) {
     struct pop3_parser *parser = malloc(sizeof(struct pop3_parser));
     pop3_parser_init(parser);
     enum pop3_state_type newState;
-    newState = parser->feed_method(&parser->state_machine, 'l');
-    newState = parser->feed_method(&parser->state_machine, 'i');
-    newState = parser->feed_method(&parser->state_machine, 's');
-    newState = parser->feed_method(&parser->state_machine, 't');
-    newState = parser->feed_method(&parser->state_machine, '\r');
-    newState = parser->feed_method(&parser->state_machine, '\n');
+    newState = parser->feed_method(parser, 'h');
+    newState = parser->feed_method(parser, 'o');
+    newState = parser->feed_method(parser, '\r');
+    newState = parser->feed_method(parser, '\n');
     if (parser->state_name != newState) {
     	printf("Distinto\n");
     } else {
