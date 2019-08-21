@@ -78,15 +78,16 @@ check_command(char * str) {
 // se fija el comando y decide a que maquina transicionar
 extern enum pop3_state_type 
 usercmd_feed(struct pop3_parser *p, uint8_t b) {
-	struct usercmd_machine *mc = &p->state_machine.usercmd_mc;
-	size_t cmdLen = strlen(mc->cmd);
+	struct usercmd_machine *mc 	= &p->state_machine.usercmd_mc;
+	size_t cmdLen 				= strlen(mc->cmd);
 	if (mc->cr && b == '\n') {
 		// Nos fijamos que comando hubo y segun eso elegimos
 		// La maquina de estados a la que seguimos
 		// Defaulteamos a server_crlf por ahora
 		// usercmd_close(p);
 		enum usr_command_type type = check_command(mc->cmd);
-		return sv_crlf;
+		printf("Nuevo type: %d\n", type);
+		return servercrlf;
 	} else if(b == '\r'){
 		mc->cr = true;
 	} else {
