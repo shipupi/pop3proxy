@@ -6,7 +6,8 @@
 #include "usercmd.h"
 
 const char* const sv_colon_cmds[] = { "list", "uidl", "top",0 };
-const char* const sv_crlf_cmds[] = { "user", "pass", "stat", "dele", "rset", "quit", 0 };
+const char* const sv_crlf_cmds[] = { "user", "pass", "stat", 
+									"dele", "rset", "quit", 0 };
 const char* const sv_retr_cmds[] = { "retr", 0 };
 
 // Pasa el comando a lower case
@@ -15,6 +16,7 @@ const char* const sv_retr_cmds[] = { "retr", 0 };
 // en 0-z, Habria q averiguar cuales son las
 // tolerancias que tienen los servidores pop3
 // respecto a este tipo de caracteres
+// (por ejemplo quizas habria q tomar / * + - etc)
 void
 sanitize_cmd (char * dest,char * src) {
 	ssize_t l 	= strlen(src);
@@ -39,7 +41,8 @@ sanitize_cmd (char * dest,char * src) {
 	dest[p] = 0;
 }
 
-
+// Retorna true si el comando esta en el array
+// Seria un alias de la funcion in_array o contains
 bool 
 cmd_matches (char * str, const char * const* cmds) {
 	int i = 0;
@@ -53,6 +56,8 @@ cmd_matches (char * str, const char * const* cmds) {
 
 }
 
+// Devuelve el tipo de comando ingresado para
+// determinar a que maquina de estados hay que transicionar
 extern enum usr_command_type 
 check_command(char * str) {
 	char sanitized_str[MAXCMDSIZE];
@@ -68,6 +73,9 @@ check_command(char * str) {
 	return unknown_cmd;
 }
 
+// Se le entrega un byte a la maquina
+// Solo se fija si termino o no. En caso de terminar, 
+// se fija el comando y decide a que maquina transicionar
 extern enum pop3_state_type 
 usercmd_feed(struct pop3_parser *p, uint8_t b) {
 	struct usercmd_machine *mc = &p->state_machine.usercmd_mc;
@@ -88,6 +96,10 @@ usercmd_feed(struct pop3_parser *p, uint8_t b) {
 	return usercmd;
 }
 
+
+// Inicializacion de la maquina
+// Carga los punteros del parser a las distintas funciones
+// de la maquina, e inicializa variables internas
 void 
 usercmd_init(struct pop3_parser *p) {
 	struct usercmd_machine user_mc 	= {
