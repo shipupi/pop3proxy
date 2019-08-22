@@ -2,6 +2,6 @@
 #define SERVERCRLF_H
 
 void
-servercolon_init(struct pop3_parser *p);
+servercrlf_init(struct pop3_parser *p);
 
 #endif

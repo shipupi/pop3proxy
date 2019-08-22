@@ -4,6 +4,8 @@
 
 #include "pop3.h"
 #include "usercmd.h"
+#include "servercrlf.h"
+#include "servercolon.h"
 
 const char* const sv_colon_cmds[] = { "list", "uidl", "top",0 };
 const char* const sv_crlf_cmds[] = { "user", "pass", "stat", 
@@ -83,11 +85,27 @@ usercmd_feed(struct pop3_parser *p, uint8_t b) {
 	if (mc->cr && b == '\n') {
 		// Nos fijamos que comando hubo y segun eso elegimos
 		// La maquina de estados a la que seguimos
-		// Defaulteamos a server_crlf por ahora
-		// usercmd_close(p);
 		enum usr_command_type type = check_command(mc->cmd);
-		printf("Nuevo type: %d\n", type);
-		return servercrlf;
+		switch (type) {
+			case colon_cmd:
+				servercolon_init(p, false);
+				return servercolon;
+			case crlf_cmd:
+				servercrlf_init(p);
+				return servercrlf;
+			case retr_cmd:
+				servercolon_init(p, true);
+				return servercolon;
+			case unknown_cmd:
+				// Unknown command mandamos a servercrlf (deberia llegar un
+				// mensaje de error, que termina con crlf)
+				servercrlf_init(p);
+				return servercrlf;
+			default:
+				fprintf(stderr, "Error unknown type\n");
+				abort();
+				break;
+		}
 	} else if(b == '\r'){
 		mc->cr = true;
 	} else {

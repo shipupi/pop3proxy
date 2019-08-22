@@ -6,12 +6,39 @@
 #include <stdint.h>
 
 #include "pop3.h"
-#include "usercmd.h"
+#include "buffer.h"
+#include "servercrlf.h"
+
+char * 
+stateToString(enum pop3_state_type type) {
+    switch(type) {
+        case usercmd:
+            return "usercmd";
+        case servercrlf:
+            return "servercrlf";
+        case servercolon:
+            return "servercolon";
+    }
+    return "unknown";
+}
 
 extern void 
 pop3_parser_init(struct pop3_parser *p) {
     // Initialize first Parser
-    usercmd_init(p);
+    servercrlf_init(p);
+}
+
+/**
+ * Por cada elemento del buffer llama a la funcion sobrecargada feed_method
+ */
+enum pop3_state_type
+pop3_consume(struct pop3_parser *p, buffer *b) {
+    enum pop3_state_type state;
+    while(buffer_can_read(b)) {
+        const uint8_t c = buffer_read(b);
+        state = p->feed_method(p, c);
+    }
+    return state;
 }
 
 int
@@ -19,24 +46,8 @@ main(const int argc, const char **argv) {
     
     struct pop3_parser parser;
     pop3_parser_init(&parser);
-    enum pop3_state_type newState;
-    newState = parser.feed_method(&parser, ' ');
-    newState = parser.feed_method(&parser, 'l');
-    newState = parser.feed_method(&parser, 'i');
-    newState = parser.feed_method(&parser, 's');
-    newState = parser.feed_method(&parser, 't');
-    newState = parser.feed_method(&parser, ' ');
-    newState = parser.feed_method(&parser, '7');
-    newState = parser.feed_method(&parser, ' ');
-    newState = parser.feed_method(&parser, 'l');
-    newState = parser.feed_method(&parser, 'Z');
-    newState = parser.feed_method(&parser, '\r');
-    newState = parser.feed_method(&parser, '\n');
-    if (parser.state_name != newState) {
-    	printf("Distinto\n");
-    } else {
-    	printf("mismo\n");
-    }
 
+
+    printf("Nothing to do - closing\n");
     return 1;
 }

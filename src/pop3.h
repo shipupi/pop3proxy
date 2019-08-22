@@ -27,7 +27,7 @@ struct servercrlf_machine {
 // con los iports tambien
 enum servercolon_state {
     servercolon_start,
-    servercolon_error, // Este estado podria redireccionar a una maquina crlf
+    servercolon_error, /* Este estado podria redireccionar a una maquina crlf */
     servercolon_ok,
     servercolon_end1,
     servercolon_end2,
@@ -48,9 +48,12 @@ union pop3_machine {
 
 struct pop3_parser {
     enum    pop3_state_type state_name;
-    // Le paso la union que tiene todas las maquinas
-    // Segun la implementacion va a bsucar la maquina
-    // de la clase en la que estoy
+    /* 
+    * Le paso la union que tiene todas las maquinas
+    * Segun la implementacion va a bsucar la maquina
+    * de la clase en la que estoy
+    */
+
     union   pop3_machine state_machine;
     enum    pop3_state_type (*feed_method)(struct pop3_parser *p, uint8_t b);
 };
@@ -60,5 +63,8 @@ void pop3_parser_init (struct pop3_parser *p);
 
 /** entrega un byte al parser. retorna true si se llego al final  */
 enum pop3_state_type pop3_parser_feed (struct pop3_parser *p, uint8_t b);
+
+/** entrega un buffer al parser y llama a parser_feed con todos los bytes */
+enum pop3_state_type pop3_consume(struct pop3_parser *p, buffer *b);
 
 #endif
